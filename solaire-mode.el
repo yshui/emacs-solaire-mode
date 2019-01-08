@@ -139,12 +139,7 @@ line number faces will be remapped to `solaire-line-number-face'."
   (when face-remapping-alist
     (dolist (remap solaire-mode-remap-alist)
       (setq face-remapping-alist (delete (car remap) face-remapping-alist))))
-  (if (not solaire-mode)
-      (unless (cl-loop for buf in (buffer-list)
-                       when (buffer-local-value 'solaire-mode buf)
-                       return t)
-        (set-face-background 'fringe (face-background 'default)))
-    (set-face-background 'fringe (face-background 'solaire-default-face))
+  (when (and solaire-mode (not (minibufferp)) (funcall solaire-mode-real-buffer-fn))
     (setq face-remapping-alist
           (append (cl-loop for (map . pred) in solaire-mode-remap-alist
                            if (eval pred)
@@ -161,9 +156,7 @@ line number faces will be remapped to `solaire-line-number-face'."
 Does nothing if it doesn't represent a real, file-visiting buffer (see
 `solaire-mode-real-buffer-fn')."
   (interactive)
-  (when (and (not solaire-mode)
-             (not (minibufferp))
-             (funcall solaire-mode-real-buffer-fn))
+  (when (not solaire-mode)
     (solaire-mode +1)))
 
 ;;;###autoload
